@@ -30,13 +30,22 @@ public class TrustVaultServer {
 
 	private static final long SESSION_TIME = 30 * 60 * 1000;
 
-	private static UserStore createUserStore() {
-		try {
-			return new UserStore();
-		} catch (Exception e) {
-			throw new IllegalStateException("Could not initialize users", e);
-		}
-	}
+	
+private static UserStore createUserStore() {
+    try {
+        UserStore store = new UserStore();
+
+        System.out.println("DEBUG users initialized:"
+                + " admin=" + store.userExists("admin")
+                + ", owner=" + store.userExists("owner")
+                + ", viewer=" + store.userExists("viewer"));
+
+        return store;
+    } catch (Exception e) {
+        throw new IllegalStateException("Could not initialize users", e);
+    }
+}
+
 
 	private static class Session {
 		final User user;
