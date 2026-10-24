@@ -9,9 +9,29 @@ public class UserStore {
             new ConcurrentHashMap<>();
 
     public UserStore() throws Exception {
-        addUser("admin", "ADMIN", "ChangeAdmin123!");
-        addUser("owner", "OWNER", "ChangeOwner123!");
-        addUser("viewer", "VIEWER", "ChangeViewer123!");
+        addDefaultUser("admin", "ADMIN", "TV_ADMIN_PASSWORD");
+        addDefaultUser("owner", "OWNER", "TV_OWNER_PASSWORD");
+        addDefaultUser("viewer", "VIEWER", "TV_VIEWER_PASSWORD");
+    }
+
+    private void addDefaultUser(
+            String username, String role, String envName)
+            throws Exception {
+
+        String password = System.getenv(envName);
+
+        if (password == null || password.length() < 12
+                || password.length() > 128) {
+            throw new IllegalStateException(
+                    "Missing or invalid environment variable: " + envName);
+        }
+
+        byte[] salt = PasswordUtil.newSalt();
+        byte[] hash = PasswordUtil.hashPassword(
+                password.toCharArray(), salt);
+
+        users.put(username,
+                new User(username, role, salt, hash));
     }
 
     private void addUser(String username, String role,
@@ -24,16 +44,27 @@ public class UserStore {
                 new User(username, role, salt, hash));
     }
 
-    public User authenticate(String username, char[] password)
-            throws Exception {
-        User user = users.get(username);
 
-        if (user == null) {
-            return null;
-        }
+public User authenticate(String username, char[] password)
+        throws Exception {
 
-        return user.verifyPassword(password) ? user : null;
+    User user = users.get(username);
+
+    System.out.println("DEBUG usernameExists="
+            + (user != null));
+
+    if (user == null) {
+        return null;
     }
+
+    boolean passwordMatches = user.verifyPassword(password);
+
+    System.out.println("DEBUG passwordMatches="
+            + passwordMatches);
+
+    return passwordMatches ? user : null;
+}
+
 
 public synchronized void registerViewer(
         String username, char[] password) throws Exception {
@@ -63,7 +94,7 @@ public synchronized void registerViewer(
 
     if (users.putIfAbsent(username, newUser) != null) {
         throw new IllegalArgumentException(
-                "Username already exists.");
+                "Username already exists.");             
     }
 }
 public boolean userExists(String username) {
