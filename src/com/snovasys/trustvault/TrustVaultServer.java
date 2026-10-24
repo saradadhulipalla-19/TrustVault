@@ -411,9 +411,12 @@ public static void main(String[] args) throws IOException {
 			return;
 		}
 
-		User user = userStore.authenticate(username, password.toCharArray());
-		System.out.println("DEBUG login username=[" + username
-		        + "], userFound=" + (user != null));
+		System.out.println("DEBUG usernameExists="
+        + userStore.userExists(username));
+
+User user = userStore.authenticate(username, password.toCharArray());
+
+System.out.println("DEBUG authenticated=" + (user != null));
 
 
 		if (user == null) {
