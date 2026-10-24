@@ -50,18 +50,26 @@ public class TrustVaultServer {
 
 	private static final DocumentStore documentStore = new DocumentStore();
 
-	public static void main(String[] args) throws IOException {
-		Files.createDirectories(STORAGE_DIR);
-		System.out.println("Private storage folder ready!");
+	
+public static void main(String[] args) throws IOException {
+    Files.createDirectories(STORAGE_DIR);
+    System.out.println("Private storage folder ready!");
 
-		HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 8083), 0);
+    int port = Integer.parseInt(
+        System.getenv().getOrDefault("PORT", "8083")
+    );
 
-		server.createContext("/", TrustVaultServer::handleRequest);
-		server.start();
+    HttpServer server = HttpServer.create(
+        new InetSocketAddress("0.0.0.0", port), 0
+    );
 
-		System.out.println("TrustVault started!");
-		System.out.println("Open http://127.0.0.1:8083/");
-	}
+    server.createContext("/", TrustVaultServer::handleRequest);
+    server.start();
+
+    System.out.println("TrustVault started on port " + port);
+    System.out.println("Server is ready!");
+}
+
 
 	private static void handleRequest(HttpExchange exchange) throws IOException {
 
