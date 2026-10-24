@@ -19,6 +19,9 @@ public class UserStore {
             throws Exception {
 
         String password = System.getenv(envName);
+        System.out.println("DEBUG env=" + envName
+                + ", isSet=" + (password != null)
+                + ", length=" + (password == null ? 0 : password.length()));
 
         if (password == null || password.length() < 12
                 || password.length() > 128) {
