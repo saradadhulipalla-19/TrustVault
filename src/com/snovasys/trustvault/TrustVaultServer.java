@@ -403,6 +403,9 @@ public static void main(String[] args) throws IOException {
 		}
 
 		User user = userStore.authenticate(username, password.toCharArray());
+		System.out.println("DEBUG login username=[" + username
+		        + "], userFound=" + (user != null));
+
 
 		if (user == null) {
 			AuditLog.record(username, "LOGIN_FAILED", "session", "DENIED");
